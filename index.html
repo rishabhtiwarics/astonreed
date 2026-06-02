@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aston Reed Perfume</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <style>
+    :root {
+      --navy: #1a1a3e;
+      --purple: #5b3d8f;
+      --purple-mid: #7b5ea7;
+      --white: #ffffff;
+      --off-white: #f6f4f9;
+      --text-dark: #1a1a3e;
+      --text-mid: #4a4a6a;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: var(--navy);
+      color: var(--white);
+      padding: 9px 0;
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    .topbar .inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .topbar i {
+      font-size: 13px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: transparent;
+      border-bottom: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+    }
+
+    header .container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* LOGO */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+    }
+
+    .logo-text {
+      line-height: 1;
+    }
+
+    .logo-text .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .logo-text .sub {
+      font-size: 9px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--purple-mid);
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+
+    nav a {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text-mid);
+      transition: color .2s;
+    }
+
+    nav a.active,
+    nav a:hover {
+      color: var(--purple);
+    }
+
+    /* HEADER ICONS */
+    .header-icons {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .header-icons button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-dark);
+      font-size: 17px;
+      padding: 4px;
+      position: relative;
+      transition: color .2s;
+    }
+
+    .header-icons button:hover {
+      color: var(--purple);
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -4px;
+      right: -6px;
+      background: var(--purple);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--off-white);
+      min-height: calc(100vh - 36px);
+      position: relative;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(42px, 5vw, 75px);
+      font-weight: 700;
+      line-height: 1.0;
+      color: var(--navy);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero-heading span {
+      color: var(--purple);
+    }
+
+    .hero-sub {
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.7;
+      max-width: 300px;
+      margin-bottom: 40px;
+      font-weight: 300;
+    }
+
+    .btn-discover {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--purple);
+      color: #fff !important;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 16px 32px;
+      text-decoration: none;
+      border-radius: 0;
+      transition: background .25s, gap .25s;
+    }
+
+    .btn-discover:hover {
+      background: var(--navy);
+      gap: 18px;
+    }
+
+    .btn-discover i {
+      font-size: 12px;
+      transition: transform .25s;
+    }
+
+    .btn-discover:hover i {
+      transform: translateX(4px);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-img-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bottle-img {
+      width: 100%;
+      max-width: 380px;
+      height: auto;
+      filter: drop-shadow(0 30px 60px rgba(91, 61, 143, .30));
+    }
+
+    @media (min-width: 992px) and (max-width: 1199px) {
+      .hero-img-wrap {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .bottle-img {
+        height: 96%;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        object-position: bottom right;
+        margin-bottom: 0;
+        transform: translateY(10px);
+      }
+
+      .hero-content {
+        max-width: 520px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .hero-img-wrap {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .bottle-img {
+        height: 92%;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        object-position: bottom right;
+        margin-bottom: 0;
+        transform: translateY(15px);
+      }
+
+      .hero-content {
+        max-width: 640px;
+      }
+    }
+
+    @media (max-width: 991px) {
+      .hero {
+        min-height: auto;
+        padding-top: 100px;
+        padding-bottom: 40px;
+        display: block;
+      }
+
+      .hero .container {
+        text-align: center;
+      }
+
+      .hero-content {
+        max-width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .hero-sub {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-heading {
+        font-size: clamp(38px, 6vw, 56px);
+      }
+
+      .hero-img-wrap {
+        position: relative;
+        width: 100%;
+        height: auto;
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .bottle-img {
+        width: 100%;
+        max-width: 480px;
+        height: auto;
+      }
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-14px);
+      }
+    }
+
+    /* ── FEATURE STRIP ── */
+    .features {
+      background: var(--white);
+      border-top: 1px solid #e5e2ef;
+      border-bottom: 1px solid #e5e2ef;
+      padding: 22px 0;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 6px 28px;
+      border-right: 1px solid #e0dcea;
+    }
+
+    .feature-item svg {
+      flex-shrink: 0;
+    }
+
+    .feature-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--navy);
+      line-height: 1.3;
+    }
+
+    .feature-desc {
+      font-size: 11px;
+      color: var(--text-mid);
+      margin-top: 3px;
+      font-weight: 300;
+      letter-spacing: 0.2px;
+    }
+
+    /* ── COLLECTIONS ── */
+    .collections-section {
+      background: var(--off-white);
+      padding: 55px 0 65px;
+    }
+
+    .collections-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .collections-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin: 0;
+    }
+
+    .view-all-link {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--navy);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .2s, gap .2s;
+    }
+
+    .view-all-link:hover {
+      color: var(--purple);
+      gap: 10px;
+    }
+
+    .view-all-link i {
+      font-size: 11px;
+    }
+
+    .coll-card {
+      position: relative;
+      height: 300px;
+      background-size: cover;
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .coll-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(30, 20, 70, .28);
+    }
+
+    .coll-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .overlay-left {
+      background: linear-gradient(to right,
+          rgba(12, 8, 40, 0.88) 0%,
+          rgba(12, 8, 40, 0.55) 50%,
+          rgba(12, 8, 40, 0.04) 100%);
+    }
+
+    .overlay-right {
+      background: linear-gradient(to left,
+          rgba(12, 8, 40, 0.88) 0%,
+          rgba(12, 8, 40, 0.55) 50%,
+          rgba(12, 8, 40, 0.04) 100%);
+    }
+
+    .coll-body {
+      position: relative;
+      z-index: 2;
+      width: 58%;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .coll-body.align-left {
+      margin-left: 0;
+      margin-right: auto;
+      text-align: left;
+      padding-left: 22px;
+    }
+
+    .coll-body.align-right {
+      margin-left: auto;
+      margin-right: 0;
+      text-align: right;
+      padding-right: 22px;
+    }
+
+    .coll-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .coll-sub {
+      font-size: 11.5px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: 0.3px;
+      margin-bottom: 20px;
+    }
+
+    .coll-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+      padding-bottom: 2px;
+      width: fit-content;
+      transition: gap .2s, border-color .2s;
+    }
+
+    .align-right .coll-btn {
+      margin-left: auto;
+    }
+
+    .coll-btn:hover {
+      gap: 10px;
+      color: #fff;
+      border-color: #fff;
+    }
+
+    .coll-btn i {
+      font-size: 9px;
+    }
+
+    /* ── BEST SELLERS ── */
+    .bestsellers-section {
+      background: var(--white);
+      padding: 55px 0 65px;
+    }
+
+    /*
+     * KEY LAYOUT:
+     * .bs-outer        → position: relative  (arrows ka anchor)
+     * .bs-prev/.next   → position: absolute, outside the clip div
+     * .bs-clip         → overflow: hidden  (cards yahan clip honge)
+     * .bs-track        → flex row of cards, transform se slide hoga
+     */
+    .bs-outer {
+      position: relative;
+    }
+
+    /* Arrows absolutely placed OUTSIDE the clip container */
+    .bs-arrow {
+      position: absolute;
+      top: 42%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid #d8d4e8;
+      background: #fff;
+      color: var(--navy);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s, color .2s, opacity .2s;
+      z-index: 10;
+      padding: 0;
+    }
+
+    .bs-arrow:hover {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .bs-prev {
+      left: -18px;
+    }
+
+    .bs-next {
+      right: -18px;
+    }
+
+    /* Clip div = the visible "window" for cards */
+    .bs-clip {
+      overflow: hidden;
+    }
+
+    /* Sliding track */
+    .bs-track {
+      display: flex;
+      gap: 20px;
+      transition: transform 0.4s ease;
+    }
+
+    /* Each card */
+    .bs-card {
+      flex: 0 0 calc(25% - 15px);
+      min-width: 0;
+      background: var(--white);
+      transition: transform .2s;
+    }
+
+    .bs-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .bs-img-wrap {
+      position: relative;
+      background: #eeeaf6;
+      border-radius: 3px;
+      overflow: hidden;
+      aspect-ratio: 1 / 1.1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bs-img-wrap img {
+      width: 75%;
+      height: 90%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+    }
+
+    .bs-wish {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--navy);
+      font-size: 15px;
+      z-index: 2;
+      padding: 0;
+      transition: color .2s;
+    }
+
+    .bs-wish:hover {
+      color: var(--purple);
+    }
+
+    .bs-info {
+      padding: 14px 2px 0;
+    }
+
+    .bs-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin-bottom: 3px;
+    }
+
+    .bs-type {
+      font-size: 11.5px;
+      font-weight: 300;
+      color: var(--text-mid);
+      margin-bottom: 12px;
+    }
+
+    .bs-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .bs-price {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .bs-price i {
+      font-size: 12px;
+    }
+
+    .bs-cart-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--purple);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 9px 14px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .2s;
+      border-radius: 2px;
+    }
+
+    .bs-cart-btn:hover {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    /* ── SHOP BY MOOD ── */
+    .mood-section {
+      background: #fbfbfe;
+      padding: 75px 0 30px;
+    }
+
+    .mood-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(21px, 2.5vw, 25px);
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--navy);
+      text-transform: uppercase;
+      text-align: left;
+      margin-bottom: 40px;
+    }
+
+    .mood-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .mood-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      flex: 0 1 auto;
+      min-width: 100px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .mood-icon-wrap {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 1px solid rgba(26, 26, 62, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--navy);
+      background: var(--white);
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .mood-icon-wrap svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--navy);
+      transition: stroke 0.3s ease, transform 0.3s ease;
+    }
+
+    .mood-item:hover .mood-icon-wrap {
+      border-color: var(--purple);
+      background: var(--off-white);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(91, 61, 143, 0.1);
+    }
+
+    .mood-item:hover .mood-icon-wrap svg {
+      stroke: var(--purple);
+      transform: scale(1.05);
+    }
+
+    .mood-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: capitalize;
+      color: var(--text-mid);
+      transition: color 0.3s ease;
+      margin-top: 3px;
+    }
+
+    .mood-item:hover .mood-label {
+      color: var(--purple);
+    }
+
+    /* ── OUR STORY ── */
+    .story-section {
+      background: #fbfbfe;
+      padding: 30px 0 80px;
+    }
+
+    @media (max-width: 991px) {
+      .mood-section {
+        padding: 50px 0 25px;
+      }
+
+      .mood-title {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .mood-grid {
+        justify-content: center;
+        gap: 24px 20px;
+      }
+
+      .story-section {
+        padding: 20px 0 60px;
+      }
+    }
+
+    .story-img-wrap {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      height: 380px;
+      box-shadow: 0 15px 35px rgba(26, 26, 62, 0.08);
+      background: var(--off-white);
+    }
+
+    .story-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 60%;
+      transition: transform 0.5s ease;
+    }
+
+    .story-img-wrap:hover img {
+      transform: scale(1.03);
+    }
+
+    .story-content {
+      padding: 10px 0 10px 30px;
+    }
+
+    .story-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--purple-mid);
+      margin-bottom: 12px;
+    }
+
+    .story-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(26px, 3vw, 36px);
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--navy);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    .story-desc {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13.5px;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.75;
+      margin-bottom: 32px;
+      max-width: 480px;
+    }
+
+    .story-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--navy);
+      color: var(--white) !important;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 15px 30px;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .story-btn:hover {
+      background: var(--purple);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(91, 61, 143, 0.2);
+    }
+
+    @media (max-width: 991px) {
+      .story-img-wrap {
+        height: 280px;
+        margin-bottom: 40px;
+      }
+
+      .story-content {
+        padding: 0;
+      }
+
+      .story-desc {
+        max-width: 100%;
+      }
+    }
+
+    /* ── LOOKBOOK MARQUEE ── */
+    .lookbook-section {
+      background: var(--white);
+      padding: 75px 0 85px;
+      overflow: hidden;
+    }
+
+    .lookbook-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 35px;
+    }
+
+    .lookbook-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(21px, 2.5vw, 25px);
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--navy);
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .view-lookbook-link {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--navy);
+      text-decoration: none;
+      transition: color 0.3s ease;
+      line-height: 1.5;
+    }
+
+    .view-lookbook-link:hover {
+      color: var(--purple);
+    }
+
+    .lookbook-marquee {
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .lookbook-marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee-scroll 32s linear infinite;
+    }
+
+
+    .lookbook-marquee-group {
+      display: flex;
+      gap: 20px;
+      padding-right: 20px;
+      flex-shrink: 0;
+    }
+
+    .lookbook-slide {
+      width: 320px;
+      height: 200px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(26, 26, 62, 0.06);
+      background: var(--off-white);
+      flex-shrink: 0;
+    }
+
+    .lookbook-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .lookbook-slide:hover img {
+      transform: scale(1.04);
+    }
+
+    @keyframes marquee-scroll {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (max-width: 767px) {
+      .lookbook-section {
+        padding: 55px 0 65px;
+      }
+
+      .lookbook-header {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .lookbook-slide {
+        width: 250px;
+        height: 160px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="container">
+      <div class="inner">
+        <i class="fa-solid fa-truck"></i>
+        FREE SHIPPING ON ALL ORDERS OVER $99
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <!-- HEADER -->
+    <header>
+      <div class="container">
+
+        <a href="#" class="logo">
+          <img src="img/logo/logo.png" alt="Aston Reed Logo" />
+          <div class="logo-text">
+            <div class="brand">Aston Reed</div>
+            <div class="sub">— Perfume —</div>
+          </div>
+        </a>
+
+        <nav>
+          <a href="#" class="active">Home</a>
+          <a href="#">Collections</a>
+          <a href="#">Shop</a>
+          <a href="#">About</a>
+          <a href="#">Journal</a>
+          <a href="#">Contact</a>
+        </nav>
+
+        <div class="header-icons">
+          <button aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+          <button aria-label="Account">
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </button>
+          <button aria-label="Cart" style="position:relative">
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="8" width="14" height="12" rx="2" ry="2"></rect>
+              <path d="M9 8V5a3 3 0 0 1 6 0v3"></path>
+            </svg>
+            <span class="cart-badge">0</span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-heading">
+          Scent<br>
+          <span>Begins</span><br>
+          With<br>
+          Presence
+        </h1>
+        <p class="hero-sub">Luxury fragrances that speak quietly but leave a lasting impression.</p>
+        <a href="#" class="btn-discover">
+          Discover Collections
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-img-wrap">
+      <img class="bottle-img" src="img/reed/hero.png" alt="Aston Reed Perfume Bottle" />
+    </div>
+  </section>
+
+  <!-- FEATURE STRIP -->
+  <div class="features">
+    <div class="container">
+      <div class="row align-items-center">
+
+        <div class="col-md-3">
+          <div class="feature-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none"
+              stroke="#3b3b6b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 12 20 22 4 22 4 12" />
+              <rect x="2" y="7" width="20" height="5" />
+              <line x1="12" y1="22" x2="12" y2="7" />
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+            </svg>
+            <div>
+              <div class="feature-label">Complimentary Gift</div>
+              <div class="feature-desc">On all orders over $89</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="feature-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none"
+              stroke="#3b3b6b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22c4-4 8-7.5 8-12a8 8 0 1 0-16 0c0 4.5 4 8 8 12z" />
+              <path d="M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+              <path d="M12 10v5" />
+            </svg>
+            <div>
+              <div class="feature-label">Finest Ingredients</div>
+              <div class="feature-desc">Sourced from around the world</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="feature-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none"
+              stroke="#3b3b6b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 3h6v2.5S17 7 17 10a5 5 0 0 1-10 0c0-3 2-4.5 2-4.5V3z" />
+              <line x1="12" y1="15" x2="12" y2="21" />
+              <line x1="9" y1="21" x2="15" y2="21" />
+            </svg>
+            <div>
+              <div class="feature-label">Long Lasting</div>
+              <div class="feature-desc">Crafted for all day confidence</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="feature-item" style="border-right:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none"
+              stroke="#3b3b6b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              <circle cx="12" cy="16" r="1" fill="#3b3b6b" />
+            </svg>
+            <div>
+              <div class="feature-label">Secure Payment</div>
+              <div class="feature-desc">100% secure checkout</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLORE OUR COLLECTIONS -->
+  <section class="collections-section">
+    <div class="container">
+
+      <div class="collections-header">
+        <h2 class="collections-title">Explore Our Collections</h2>
+        <a href="#" class="view-all-link">View All Collections &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+      <div class="row g-2">
+
+        <div class="col-md-3 col-sm-6">
+          <div class="coll-card" style="background-image:url('/img/reed/col1.png'); background-position:left center;">
+            <div class="coll-overlay overlay-right"></div>
+            <div class="coll-body align-right">
+              <h3 class="coll-name">Signature<br>Collection</h3>
+              <p class="coll-sub">Timeless &amp; Refined</p>
+              <a href="#" class="coll-btn">Shop Now &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="coll-card" style="background-image:url('/img/reed/col2.png'); background-position:left center;">
+            <div class="coll-overlay overlay-right"></div>
+            <div class="coll-body align-right">
+              <h3 class="coll-name">Oud<br>Collection</h3>
+              <p class="coll-sub">Rich &amp; Intense</p>
+              <a href="#" class="coll-btn">Shop Now &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="coll-card" style="background-image:url('/img/reed/col3.png'); background-position:right center;">
+            <div class="coll-overlay overlay-left"></div>
+            <div class="coll-body align-left">
+              <h3 class="coll-name">Royal<br>Collection</h3>
+              <p class="coll-sub">Royalty in Every Drop</p>
+              <a href="#" class="coll-btn">Shop Now &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="coll-card" style="background-image:url('/img/reed/col4.png'); background-position:right center;">
+            <div class="coll-overlay overlay-left"></div>
+            <div class="coll-body align-left">
+              <h3 class="coll-name">Limited<br>Edition</h3>
+              <p class="coll-sub">Exclusive &amp; Rare</p>
+              <a href="#" class="coll-btn">Shop Now &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- BEST SELLERS -->
+  <section class="bestsellers-section">
+    <div class="container">
+
+      <!-- Section header -->
+      <div class="collections-header">
+        <h2 class="collections-title">Best Sellers</h2>
+        <a href="#" class="view-all-link">View All Products &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+      <!--
+        STRUCTURE EXPLANATION:
+        .bs-outer       → position:relative  →  anchor for absolute arrows
+        .bs-prev        → position:absolute, left:-18px  →  OUTSIDE the clip, left side
+        .bs-clip        → overflow:hidden  →  visible window for cards (= container boundary)
+        .bs-track       → flex row, slides via transform
+        .bs-next        → position:absolute, right:-18px  →  OUTSIDE the clip, right side
+      -->
+      <div class="bs-outer">
+
+        <!-- LEFT ARROW — sits outside .bs-clip on the left -->
+        <button class="bs-arrow bs-prev" id="bsPrev" aria-label="Previous">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <!-- Cards container (clips overflow) -->
+        <div class="bs-clip">
+          <div class="bs-track" id="bsTrack">
+
+            <!-- Product 1 -->
+            <div class="bs-card">
+              <div class="bs-img-wrap">
+                <button class="bs-wish"><i class="fa-regular fa-heart"></i></button>
+                <img src="img/reed/product_1.png" alt="Midnight Elixir" />
+              </div>
+              <div class="bs-info">
+                <h4 class="bs-name">Midnight Elixir</h4>
+                <p class="bs-type">Eau de Parfum</p>
+                <div class="bs-bottom">
+                  <span class="bs-price"><i class="fa-solid fa-indian-rupee-sign"></i>10,750</span>
+                  <a href="#" class="bs-cart-btn">Add to Cart</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="bs-card">
+              <div class="bs-img-wrap">
+                <button class="bs-wish"><i class="fa-regular fa-heart"></i></button>
+                <img src="img/reed/product_2.png" alt="Velvet Oud" />
+              </div>
+              <div class="bs-info">
+                <h4 class="bs-name">Velvet Oud</h4>
+                <p class="bs-type">Eau de Parfum</p>
+                <div class="bs-bottom">
+                  <span class="bs-price"><i class="fa-solid fa-indian-rupee-sign"></i>12,390</span>
+                  <a href="#" class="bs-cart-btn">Add to Cart</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="bs-card">
+              <div class="bs-img-wrap">
+                <button class="bs-wish"><i class="fa-regular fa-heart"></i></button>
+                <img src="img/reed/product_3.png" alt="Coastal Breeze" />
+              </div>
+              <div class="bs-info">
+                <h4 class="bs-name">Coastal Breeze</h4>
+                <p class="bs-type">Eau de Toilette</p>
+                <div class="bs-bottom">
+                  <span class="bs-price"><i class="fa-solid fa-indian-rupee-sign"></i>9,870</span>
+                  <a href="#" class="bs-cart-btn">Add to Cart</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="bs-card">
+              <div class="bs-img-wrap">
+                <button class="bs-wish"><i class="fa-regular fa-heart"></i></button>
+                <img src="img/reed/product_4.png" alt="Royal Musk" />
+              </div>
+              <div class="bs-info">
+                <h4 class="bs-name">Royal Musk</h4>
+                <p class="bs-type">Eau de Parfum</p>
+                <div class="bs-bottom">
+                  <span class="bs-price"><i class="fa-solid fa-indian-rupee-sign"></i>11,550</span>
+                  <a href="#" class="bs-cart-btn">Add to Cart</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product 5 -->
+            <div class="bs-card">
+              <div class="bs-img-wrap">
+                <button class="bs-wish"><i class="fa-regular fa-heart"></i></button>
+                <img src="img/reed/product_3.png" alt="Amber Noir" />
+              </div>
+              <div class="bs-info">
+                <h4 class="bs-name">Amber Noir</h4>
+                <p class="bs-type">Eau de Parfum</p>
+                <div class="bs-bottom">
+                  <span class="bs-price"><i class="fa-solid fa-indian-rupee-sign"></i>13,200</span>
+                  <a href="#" class="bs-cart-btn">Add to Cart</a>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /bs-track -->
+        </div><!-- /bs-clip -->
+
+        <!-- RIGHT ARROW — sits outside .bs-clip on the right -->
+        <button class="bs-arrow bs-next" id="bsNext" aria-label="Next">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+      </div><!-- /bs-outer -->
+
+    </div><!-- /container -->
+  </section>
+
+  <!-- ── NEW ARRIVAL BANNER ── -->
+  <section class="arrival-section">
+    <div class="container">
+      <div class="arrival-banner">
+
+        <!-- Parallax BG image + overlay -->
+        <div class="arrival-bg" id="arrivalBg"></div>
+        <div class="arrival-overlay"></div>
+
+        <!-- LEFT: Text content -->
+        <div class="arrival-content">
+          <p class="arrival-eyebrow">New Arrival</p>
+          <h2 class="arrival-title">Midnight Elixir</h2>
+          <p class="arrival-desc">A rich blend of oud, amber<br>and velvet musk.</p>
+          <a href="#" class="arrival-btn">Explore Now &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SHOP BY MOOD ── -->
+  <section class="mood-section">
+    <div class="container">
+      <h2 class="mood-title">SHOP BY MOOD</h2>
+      <div class="mood-grid">
+        <!-- Mood 1 -->
+        <a class="mood-item" href="#">
+          <div class="mood-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="9" r="2.5" />
+              <path d="M12 6.5V4.5a2 2 0 1 0-2-2" />
+              <path d="M5 20a3.5 3.5 0 0 1 3.5-3.5h7A3.5 3.5 0 0 1 19 20" />
+            </svg>
+          </div>
+          <span class="mood-label">Daily Wear</span>
+        </a>
+
+        <!-- Mood 2 -->
+        <a class="mood-item" href="#">
+          <div class="mood-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="7" width="18" height="13" rx="2" ry="2" />
+              <path d="M16 7V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v3" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <path d="M12 12v3" />
+            </svg>
+          </div>
+          <span class="mood-label">Office</span>
+        </a>
+
+        <!-- Mood 3 -->
+        <a class="mood-item" href="#">
+          <div class="mood-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 16.5l-4-4a3 3 0 0 1 4.24-4.24l.76.76.76-.76a3 3 0 0 1 4.24 4.24l-1.76 1.76" />
+              <path d="M15 13.5l-1.76-1.76a3 3 0 0 1 4.24-4.24l.76.76.76-.76a3 3 0 0 1 4.24 4.24l-4 4" />
+            </svg>
+          </div>
+          <span class="mood-label">Date Night</span>
+        </a>
+
+        <!-- Mood 4 -->
+        <a class="mood-item" href="#">
+          <div class="mood-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="6" y="9" width="12" height="12" rx="2" />
+              <path d="M9 9V7h6v2" />
+              <circle cx="12" cy="4.5" r="1.5" />
+              <path d="M10 6h4" />
+              <path d="M12 12l2 2-2 2-2-2z" />
+            </svg>
+          </div>
+          <span class="mood-label">Luxury Events</span>
+        </a>
+
+        <!-- Mood 5 -->
+        <a class="mood-item" href="#">
+          <div class="mood-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          </div>
+          <span class="mood-label">Evening</span>
+        </a>
+
+        <!-- Mood 6 -->
+        <a class="mood-item" href="#">
+          <div class="mood-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L3 11l9 9 9-9-9-9z" />
+              <path d="M12 7a3 3 0 0 0-3 3c0 3 3 7 3 7s3-4 3-7a3 3 0 0 0-3-3z" />
+            </svg>
+          </div>
+          <span class="mood-label">Special Occasions</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── OUR STORY ── -->
+  <section class="story-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <!-- Left: Branding Image Composition -->
+        <div class="col-lg-6">
+          <div class="story-img-wrap">
+            <img src="img/reed/ourstore.png" alt="Aston Reed Perfume Composition" />
+          </div>
+        </div>
+        <!-- Right: Storytelling content -->
+        <div class="col-lg-6">
+          <div class="story-content">
+            <p class="story-eyebrow">OUR STORY</p>
+            <h2 class="story-title">CRAFTED WITH PASSION,<br>MADE TO BE REMEMBERED.</h2>
+            <p class="story-desc">
+              At Aston Reed, every fragrance is a masterpiece crafted from the finest ingredients, inspired by elegance
+              and made for those who leave a mark.
+            </p>
+            <a class="story-btn" href="#">
+              DISCOVER OUR JOURNEY &nbsp;&rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── THE ASTON REED LOOKBOOK ── -->
+  <section class="lookbook-section">
+    <div class="container-fluid px-0">
+      <div class="container">
+        <div class="lookbook-header">
+          <h2 class="lookbook-title">THE ASTON REED LOOKBOOK</h2>
+          <a href="#" class="view-lookbook-link">VIEW LOOKBOOK &nbsp;&rarr;</a>
+        </div>
+      </div>
+
+      <!-- Infinite Marquee Slider -->
+      <div class="lookbook-marquee">
+        <div class="lookbook-marquee-track">
+          <!-- Group 1 -->
+          <div class="lookbook-marquee-group">
+            <div class="lookbook-slide">
+              <img src="img/reed/lookbook1.png" alt="Aston Reed Perfume on Rock" />
+            </div>
+            <div class="lookbook-slide">
+              <img src="img/reed/lookbook2.png" alt="Man with Aston Reed Perfume" />
+            </div>
+            <div class="lookbook-slide">
+              <img src="img/reed/lookbook3.png" alt="Royal Musk in Flowers" />
+            </div>
+            <div class="lookbook-slide">
+              <img src="img/reed/lookbook4.png" alt="Woman with Aston Reed Perfume" />
+            </div>
+            <div class="lookbook-slide">
+              <img src="img/reed/lookbook1.png" alt="Aura Rose on Satin" />
+            </div>
+          </div>
+          <!-- Group 2 (Duplicate for loop) -->
+          <div class="lookbook-marquee-group">
+            <div class="lookbook-slide">
+              <img src="img/reed/lookbook2.png" alt="Man with Aston Reed Perfume" />
+            </div>
+            <div class="lookbook-slide">
+              <img src="img/reed/lookbook3.png" alt="Royal Musk in Flowers" />
+            </div>
+            <div class="lookbook-slide">
+              <img src="img/reed/lookbook4.png" alt="Woman with Aston Reed Perfume" />
+            </div>
+            <div class="lookbook-slide">
+              <img src="img/reed/lookbook1.png" alt="Aura Rose on Satin" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    /* ── NEW ARRIVAL BANNER ── */
+    .arrival-section {
+      background: var(--off-white);
+      padding: 50px 0 60px;
+    }
+
+    /* Outer card with rounded corners — matches figma */
+    .arrival-banner {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Banner BG */
+    .arrival-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('img/reed/arrival.png');
+      background-size: contain;
+      background-position: center center;
+    }
+
+    /* Dark gradient overlay — heavier on left for text, lighter on right */
+    .arrival-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right,
+          rgba(10, 12, 45, 0.82) 0%,
+          rgba(10, 12, 45, 0.68) 38%,
+          rgba(10, 12, 45, 0.28) 65%,
+          rgba(10, 12, 45, 0.05) 100%);
+      z-index: 1;
+    }
+
+    /* Text content */
+    .arrival-content {
+      position: relative;
+      z-index: 2;
+      padding: 35px 0 35px 52px;
+      flex: 0 0 65%;
+    }
+
+    .arrival-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.65);
+      margin-bottom: 10px;
+    }
+
+    .arrival-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(38px, 4.5vw, 58px);
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+
+    .arrival-desc {
+      font-size: 13px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.80);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    /* Outlined button — matches figma */
+    .arrival-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 12px 26px;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: background .25s, border-color .25s, gap .25s;
+    }
+
+    .arrival-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.9);
+      color: #fff;
+      gap: 14px;
+    }
+
+    .arrival-btn i {
+      font-size: 11px;
+    }
+
+    /* Bottle image — right side */
+    .arrival-bottle-wrap {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 48%;
+      z-index: 2;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .arrival-bottle {
+      height: 105%;
+      width: auto;
+      object-fit: contain;
+      object-position: bottom center;
+      mix-blend-mode: luminosity;
+      filter: brightness(1.05) contrast(1.05);
+      transform: translateY(0);
+      animation: arrivalFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes arrivalFloat {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+
+  <script>
+    (function () {
+      const track = document.getElementById('bsTrack');
+      const cards = track.querySelectorAll('.bs-card');
+      const prevBtn = document.getElementById('bsPrev');
+      const nextBtn = document.getElementById('bsNext');
+
+      const visible = 4;
+      const total = cards.length;
+      let idx = 0;
+
+      function update() {
+        const gap = 20;
+        const cardW = cards[0].offsetWidth + gap;
+        track.style.transform = 'translateX(-' + (idx * cardW) + 'px)';
+        track.style.transition = 'transform 0.4s ease';
+
+        /* Dim arrow when at boundary */
+        prevBtn.style.opacity = idx === 0 ? '0.35' : '1';
+        prevBtn.style.pointerEvents = idx === 0 ? 'none' : 'auto';
+        nextBtn.style.opacity = idx >= total - visible ? '0.35' : '1';
+        nextBtn.style.pointerEvents = idx >= total - visible ? 'none' : 'auto';
+      }
+
+      prevBtn.addEventListener('click', function () {
+        if (idx > 0) { idx--; update(); }
+      });
+
+      nextBtn.addEventListener('click', function () {
+        if (idx < total - visible) { idx++; update(); }
+      });
+
+      /* Initial state */
+      update();
+    })();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
