@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import CartItem from '../../components/cart/CartItem/CartItem';
 import { clearCart } from '../../store/slices/cartSlice';
+import innrbnner from '../../assets/img/reed/innrbnner.png';
 
 const schema = Yup.object({
-  fullName: Yup.string().required('Full name is required'),
-  email: Yup.string().email('Invalid email').required('Email is required'),
-  phone: Yup.string().matches(/^[0-9]{10}$/, 'Enter valid 10-digit number').required('Phone is required'),
-  address: Yup.string().required('Address is required'),
+  fullName: Yup.string().min(2, 'Name must be at least 2 characters').required('Full name is required'),
+  email: Yup.string().email('Please enter a valid email').required('Email is required'),
+  phone: Yup.string().matches(/^[0-9]{10}$/, 'Phone number must be exactly 10 digits').required('Phone is required'),
+  address: Yup.string().required('Street address is required'),
   city: Yup.string().required('City is required'),
   state: Yup.string().required('State is required'),
-  pincode: Yup.string().matches(/^[0-9]{6}$/, 'Enter valid 6-digit pincode').required('Pincode is required'),
+  pincode: Yup.string().matches(/^[0-9]{6}$/, 'Pincode must be exactly 6 digits').required('Pincode is required'),
 });
 
 export default function Checkout() {
@@ -21,125 +21,566 @@ export default function Checkout() {
   const navigate = useNavigate();
   const { items, total } = useSelector(s => s.cart);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const fmt = (n) => '₹' + n.toLocaleString('en-IN');
+  const [paymentId, setPaymentId] = useState('');
+  const [activeStep, setActiveStep] = useState(1);
+
+  const fmt = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
   const shipping = total > 9900 ? 0 : 299;
-  const grandTotal = total + shipping;
+  const tax = Math.round(total * 0.18); // 18% GST
+  const insurance = total > 0 ? 99 : 0; // Transit insurance
+  const grandTotal = total + shipping + tax + insurance;
+
+  // Dynamically load Razorpay SDK
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
 
   const formik = useFormik({
-    initialValues: { fullName: '', email: '', phone: '', address: '', city: '', state: '', pincode: '' },
+    initialValues: {
+      fullName: '',
+      email: '',
+      phone: '',
+      address: '',
+      city: '',
+      state: '',
+      pincode: '',
+    },
     validationSchema: schema,
-    onSubmit: () => {
-      dispatch(clearCart());
-      setOrderPlaced(true);
+    onSubmit: async (values) => {
+      const sdkLoaded = await loadRazorpay();
+      if (!sdkLoaded) {
+        alert('Razorpay Payment Gateway failed to load. Please check your internet connection.');
+        return;
+      }
+
+      const options = {
+        key: 'rzp_test_placeholderKey', // Testing client-side key
+        amount: grandTotal * 100, // Amount in paisa
+        currency: 'INR',
+        name: 'Aston Reed',
+        description: 'Luxury Fragrance Order Checkout',
+        image: 'https://placehold.co/150x150/1a1a3e/c9a84c?text=AR',
+        handler: function (response) {
+          setPaymentId(response.razorpay_payment_id || 'pay_simulated_id_1001');
+          dispatch(clearCart());
+          setOrderPlaced(true);
+        },
+        prefill: {
+          name: values.fullName,
+          email: values.email,
+          contact: values.phone,
+        },
+        notes: {
+          address: `${values.address}, ${values.city}, ${values.state} - ${values.pincode}`,
+        },
+        theme: {
+          color: '#5b3d8f', // Brand purple
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     },
   });
 
-  if (orderPlaced) {
+  const handleNextStep1 = async () => {
+    formik.setFieldTouched('fullName', true);
+    formik.setFieldTouched('email', true);
+    formik.setFieldTouched('phone', true);
+
+    const errors = await formik.validateForm();
+    if (!errors.fullName && !errors.email && !errors.phone) {
+      setActiveStep(2);
+    }
+  };
+
+  const handleNextStep2 = async () => {
+    formik.setFieldTouched('address', true);
+    formik.setFieldTouched('city', true);
+    formik.setFieldTouched('state', true);
+    formik.setFieldTouched('pincode', true);
+
+    const errors = await formik.validateForm();
+    if (!errors.address && !errors.city && !errors.state && !errors.pincode) {
+      setActiveStep(3);
+    }
+  };
+
+  // Redirect to cart if empty
+  if (items.length === 0 && !orderPlaced) {
     return (
-      <div className="checkout-page">
-        <div className="container">
-          <div className="checkout-success">
-            <div className="checkout-success__icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            </div>
-            <h2 className="checkout-success__title">Order Placed!</h2>
-            <p className="checkout-success__sub">Thank you for your purchase. We'll send a confirmation to your email.</p>
-            <button className="checkout-success__btn" onClick={() => navigate('/shop')}>CONTINUE SHOPPING</button>
-          </div>
-        </div>
+      <div className="container" style={{ textAlign: 'center', padding: '120px 20px' }}>
+        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '32px', color: 'var(--navy)', marginBottom: '16px' }}>Your bag is empty</h2>
+        <p style={{ color: 'var(--text-mid)', marginBottom: '24px' }}>Please add products to your cart before checking out.</p>
+        <Link to="/shop" className="figma-checkout-btn" style={{ maxWidth: '240px', margin: '0 auto' }}>GO TO SHOP</Link>
       </div>
     );
   }
 
-  if (items.length === 0) {
-    navigate('/cart');
-    return null;
-  }
-
-  return (
-    <div className="checkout-page">
-      <div className="container">
-        <h1 className="checkout-page__title">CHECKOUT</h1>
-
-        <div className="checkout-layout">
-          {/* LEFT — Form */}
-          <form className="checkout-form" onSubmit={formik.handleSubmit} noValidate>
-            <h3 className="checkout-form__section-title">Contact Information</h3>
-            <div className="checkout-form__grid">
-              {[
-                { name: 'fullName', label: 'Full Name', type: 'text', placeholder: 'John Doe', col: 2 },
-                { name: 'email', label: 'Email Address', type: 'email', placeholder: 'john@example.com', col: 1 },
-                { name: 'phone', label: 'Phone Number', type: 'tel', placeholder: '9876543210', col: 1 },
-              ].map(f => (
-                <div key={f.name} className={`form-group checkout-form__field${f.col === 2 ? ' checkout-form__field--full' : ''}`}>
-                  <label className="form-label">{f.label}</label>
-                  <input
-                    className={`form-input ${formik.touched[f.name] && formik.errors[f.name] ? 'form-input--error' : ''}`}
-                    type={f.type}
-                    placeholder={f.placeholder}
-                    {...formik.getFieldProps(f.name)}
-                  />
-                  {formik.touched[f.name] && formik.errors[f.name] && (
-                    <p className="form-error">{formik.errors[f.name]}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <h3 className="checkout-form__section-title" style={{ marginTop: '28px' }}>Shipping Address</h3>
-            <div className="checkout-form__grid">
-              {[
-                { name: 'address', label: 'Street Address', type: 'text', placeholder: '123 Main Street, Apt 4B', col: 2 },
-                { name: 'city', label: 'City', type: 'text', placeholder: 'Mumbai', col: 1 },
-                { name: 'state', label: 'State', type: 'text', placeholder: 'Maharashtra', col: 1 },
-                { name: 'pincode', label: 'Pincode', type: 'text', placeholder: '400001', col: 1 },
-              ].map(f => (
-                <div key={f.name} className={`form-group checkout-form__field${f.col === 2 ? ' checkout-form__field--full' : ''}`}>
-                  <label className="form-label">{f.label}</label>
-                  <input
-                    className={`form-input ${formik.touched[f.name] && formik.errors[f.name] ? 'form-input--error' : ''}`}
-                    type={f.type}
-                    placeholder={f.placeholder}
-                    {...formik.getFieldProps(f.name)}
-                  />
-                  {formik.touched[f.name] && formik.errors[f.name] && (
-                    <p className="form-error">{formik.errors[f.name]}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <button type="submit" className="checkout-form__submit" disabled={formik.isSubmitting}>
-              PLACE ORDER — {fmt(grandTotal)}
-            </button>
-          </form>
-
-          {/* RIGHT — Summary */}
-          <div className="checkout-summary">
-            <h3 className="checkout-summary__title">ORDER SUMMARY</h3>
-            <div className="checkout-summary__items">
-              {items.map(item => (
-                <CartItem key={item.id} item={item} compact />
-              ))}
-            </div>
-            <div className="checkout-summary__divider" />
-            <div className="checkout-summary__row">
-              <span>Subtotal</span><span>{fmt(total)}</span>
-            </div>
-            <div className="checkout-summary__row">
-              <span>Shipping</span>
-              <span>{shipping === 0 ? <span style={{ color: 'var(--purple)' }}>FREE</span> : fmt(shipping)}</span>
-            </div>
-            <div className="checkout-summary__divider" />
-            <div className="checkout-summary__row checkout-summary__row--total">
-              <span>Total</span><span>{fmt(grandTotal)}</span>
+  if (orderPlaced) {
+    return (
+      <>
+        {/* Page hero */}
+        <div className="shop-hero" style={{ backgroundImage: `url(${innrbnner})` }}>
+          <div className="shop-hero-overlay" />
+          <div className="container">
+            <div className="shop-hero-content">
+              <p className="shop-hero-subtitle">Order Process</p>
+              <h1 className="shop-hero-title">Checkout</h1>
             </div>
           </div>
         </div>
+
+        {/* Progress Steps Header */}
+        <div className="container">
+          <div className="figma-checkout-steps">
+            <div className="steps-container">
+              <div className="step-item completed">
+                <div className="step-completed-icon">✓</div>
+                <span>Identify</span>
+              </div>
+              <div className="step-item completed">
+                <div className="step-completed-icon">✓</div>
+                <span>Address</span>
+              </div>
+              <div className="step-item completed">
+                <div className="step-completed-icon">✓</div>
+                <span>Payment</span>
+              </div>
+            </div>
+            <Link to="/" className="prev-step">
+              Home
+            </Link>
+          </div>
+        </div>
+
+        <div className="container" style={{ margin: '40px auto 80px auto', maxWidth: '600px', textAlign: 'center' }}>
+          <div className="order-items-card" style={{ padding: '40px' }}>
+            <div style={{ color: 'var(--purple)', marginBottom: '24px' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ stroke: 'var(--gold)' }}>
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </div>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '36px', color: 'var(--navy)', marginBottom: '12px' }}>Order Placed Successfully!</h2>
+            <p style={{ color: 'var(--text-mid)', fontSize: '14px', lineHeight: '1.7', marginBottom: '24px' }}>
+              Thank you for choosing Aston Reed. Your luxury order has been placed. We have sent a confirmation email to you.
+            </p>
+            <div style={{ background: '#f6f4f9', padding: '16px', margin: '20px 0', border: '1px solid #e5e2ef', fontSize: '13px', textAlign: 'left', color: 'var(--navy)', fontFamily: 'Montserrat, sans-serif' }}>
+              <p style={{ margin: '0 0 8px 0' }}><strong>Payment Gateway:</strong> Razorpay</p>
+              <p style={{ margin: '0' }}><strong>Transaction ID:</strong> {paymentId}</p>
+            </div>
+            <Link to="/shop" className="figma-checkout-btn" style={{ marginTop: '24px' }}>CONTINUE SHOPPING</Link>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {/* Page styles overrides for input boxes */}
+      <style>{`
+        .checkout-form-card .form-group {
+          margin-bottom: 20px;
+        }
+        .checkout-form-card .form-input {
+          border-radius: 0;
+          border-color: #e5e2ef;
+          padding: 12px 16px;
+        }
+        .checkout-form-card .form-input:focus {
+          border-color: var(--purple);
+        }
+        .checkout-form-card .form-label {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 10.5px;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--navy);
+          margin-bottom: 8px;
+        }
+        .checkout-section-subtitle {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--gold);
+          margin-top: 30px;
+          margin-bottom: 20px;
+          border-bottom: 1px dashed #e5e2ef;
+          padding-bottom: 10px;
+        }
+        .checkout-form-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+        .checkout-form-grid-3 {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 20px;
+        }
+        .checkout-actions-row {
+          display: flex;
+          gap: 15px;
+          margin-top: 30px;
+        }
+        .figma-checkout-btn {
+          white-space: nowrap !important;
+        }
+        @media (max-width: 576px) {
+          .checkout-form-grid-2,
+          .checkout-form-grid-3 {
+            grid-template-columns: 1fr !important;
+          }
+          .checkout-form-grid-2 > .form-group,
+          .checkout-form-grid-3 > .form-group {
+            grid-column: span 1 !important;
+          }
+          .checkout-actions-row {
+            flex-direction: column-reverse;
+            gap: 10px;
+          }
+          .checkout-actions-row button,
+          .checkout-actions-row a {
+            width: 100% !important;
+          }
+        }
+      `}</style>
+
+      {/* Page hero */}
+      <div className="shop-hero" style={{ backgroundImage: `url(${innrbnner})` }}>
+        <div className="shop-hero-overlay" />
+        <div className="container">
+          <div className="shop-hero-content">
+            <p className="shop-hero-subtitle">Order Process</p>
+            <h1 className="shop-hero-title">Checkout</h1>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Progress Steps Header */}
+      <div className="container">
+        <div className="figma-checkout-steps">
+          <div className="steps-container">
+            {/* Step 1: Identify */}
+            <div className={`step-item ${activeStep > 1 ? 'completed' : activeStep === 1 ? 'active' : ''}`}>
+              {activeStep > 1 ? (
+                <div className="step-completed-icon">✓</div>
+              ) : (
+                <div className="step-badge">1</div>
+              )}
+              <span>Identify</span>
+            </div>
+
+            {/* Step 2: Address */}
+            <div className={`step-item ${activeStep > 2 ? 'completed' : activeStep === 2 ? 'active' : ''}`}>
+              {activeStep > 2 ? (
+                <div className="step-completed-icon">✓</div>
+              ) : (
+                <div className="step-badge">2</div>
+              )}
+              <span>Address</span>
+            </div>
+
+            {/* Step 3: Payment */}
+            <div className={`step-item ${activeStep === 3 ? 'active' : ''}`}>
+              <div className="step-badge">3</div>
+              <span>Payment</span>
+            </div>
+          </div>
+
+          {activeStep === 1 ? (
+            <Link to="/cart" className="prev-step">
+              ← Back to Bag
+            </Link>
+          ) : activeStep === 2 ? (
+            <button type="button" onClick={() => setActiveStep(1)} className="prev-step" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              ← Back to Identify
+            </button>
+          ) : (
+            <button type="button" onClick={() => setActiveStep(2)} className="prev-step" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              ← Back to Address
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Main Page Layout */}
+      <div className="container">
+        <form onSubmit={formik.handleSubmit}>
+          <div className="cart-figma-layout">
+            
+            {/* Left Column: Form Card */}
+            <div className="order-items-card checkout-form-card">
+              
+              {activeStep === 1 && (
+                <>
+                  <div className="order-items-header">
+                    <h2 className="order-items-title">1. Identify</h2>
+                  </div>
+                  <div className="checkout-form-grid-2">
+                    <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                      <label className="form-label">Full Name</label>
+                      <input
+                        className="form-input"
+                        type="text"
+                        placeholder="Enter your full name"
+                        {...formik.getFieldProps('fullName')}
+                      />
+                      {formik.touched.fullName && formik.errors.fullName && (
+                        <p className="form-error">{formik.errors.fullName}</p>
+                      )}
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Email Address</label>
+                      <input
+                        className="form-input"
+                        type="email"
+                        placeholder="Enter your email"
+                        {...formik.getFieldProps('email')}
+                      />
+                      {formik.touched.email && formik.errors.email && (
+                        <p className="form-error">{formik.errors.email}</p>
+                      )}
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Phone Number</label>
+                      <input
+                        className="form-input"
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        {...formik.getFieldProps('phone')}
+                      />
+                      {formik.touched.phone && formik.errors.phone && (
+                        <p className="form-error">{formik.errors.phone}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button type="button" onClick={handleNextStep1} className="figma-checkout-btn" style={{ minWidth: '240px', width: 'auto', maxWidth: '100%' }}>
+                      CONTINUE TO SHIPPING
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {activeStep === 2 && (
+                <>
+                  <div className="order-items-header">
+                    <h2 className="order-items-title">2. Shipping Address</h2>
+                  </div>
+                  <div className="checkout-form-grid-3">
+                    <div className="form-group" style={{ gridColumn: 'span 3' }}>
+                      <label className="form-label">Street Address</label>
+                      <input
+                        className="form-input"
+                        type="text"
+                        placeholder="House No, Building, Street name"
+                        {...formik.getFieldProps('address')}
+                      />
+                      {formik.touched.address && formik.errors.address && (
+                        <p className="form-error">{formik.errors.address}</p>
+                      )}
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">City</label>
+                      <input
+                        className="form-input"
+                        type="text"
+                        placeholder="Mumbai"
+                        {...formik.getFieldProps('city')}
+                      />
+                      {formik.touched.city && formik.errors.city && (
+                        <p className="form-error">{formik.errors.city}</p>
+                      )}
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">State</label>
+                      <input
+                        className="form-input"
+                        type="text"
+                        placeholder="Maharashtra"
+                        {...formik.getFieldProps('state')}
+                      />
+                      {formik.touched.state && formik.errors.state && (
+                        <p className="form-error">{formik.errors.state}</p>
+                      )}
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Pincode</label>
+                      <input
+                        className="form-input"
+                        type="text"
+                        placeholder="400001"
+                        {...formik.getFieldProps('pincode')}
+                      />
+                      {formik.touched.pincode && formik.errors.pincode && (
+                        <p className="form-error">{formik.errors.pincode}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="checkout-actions-row">
+                    <button type="button" onClick={() => setActiveStep(1)} className="figma-qty-btn" style={{ height: '48px', width: '120px', border: '1px solid #e5e2ef', background: '#fff', letterSpacing: '1.5px', fontWeight: '700' }}>
+                      BACK
+                    </button>
+                    <button type="button" onClick={handleNextStep2} className="figma-checkout-btn" style={{ flex: 1 }}>
+                      CONTINUE TO PAYMENT
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {activeStep === 3 && (
+                <>
+                  <div className="order-items-header">
+                    <h2 className="order-items-title">3. Payment & Review</h2>
+                  </div>
+                  <div>
+                    <div style={{ marginBottom: '24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <h4 style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '11px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--gold)', margin: 0 }}>Personal Details</h4>
+                        <button type="button" onClick={() => setActiveStep(1)} className="edit-cart-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Edit</button>
+                      </div>
+                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '13px', margin: '4px 0', color: 'var(--navy)' }}><strong>Name:</strong> {formik.values.fullName}</p>
+                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '13px', margin: '4px 0', color: 'var(--navy)' }}><strong>Email:</strong> {formik.values.email}</p>
+                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '13px', margin: '4px 0', color: 'var(--navy)' }}><strong>Phone:</strong> {formik.values.phone}</p>
+                    </div>
+
+                    <div style={{ height: '1px', background: '#e5e2ef', margin: '20px 0' }} />
+
+                    <div style={{ marginBottom: '24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <h4 style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '11px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--gold)', margin: 0 }}>Shipping Address</h4>
+                        <button type="button" onClick={() => setActiveStep(2)} className="edit-cart-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Edit</button>
+                      </div>
+                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '13px', margin: '4px 0', color: 'var(--navy)', lineHeight: '1.6' }}>
+                        {formik.values.address},<br />
+                        {formik.values.city}, {formik.values.state} - {formik.values.pincode}
+                      </p>
+                    </div>
+
+                    <div style={{ height: '1px', background: '#e5e2ef', margin: '20px 0' }} />
+
+                    <div style={{ background: '#f6f4f9', padding: '20px', border: '1px solid #e5e2ef', marginBottom: '24px' }}>
+                      <h4 style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '11px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--navy)', margin: '0 0 10px 0' }}>Payment Method</h4>
+                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '13px', color: 'var(--navy)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--gold)' }}>
+                          <rect x="2" y="5" width="20" height="14" rx="2" />
+                          <line x1="2" y1="10" x2="22" y2="10" />
+                        </svg>
+                        Razorpay Secure Checkout
+                      </p>
+                      <p style={{ fontSize: '11px', color: 'var(--text-mid)', margin: '0', lineHeight: '1.5', fontFamily: 'Montserrat, sans-serif' }}>
+                        Please review your details. Click "Proceed to Pay" to launch the secure payment portal.
+                      </p>
+                    </div>
+
+                    <div className="checkout-actions-row" style={{ marginTop: 0 }}>
+                      <button type="button" onClick={() => setActiveStep(2)} className="figma-qty-btn" style={{ height: '48px', width: '120px', border: '1px solid #e5e2ef', background: '#fff', letterSpacing: '1.5px', fontWeight: '700' }}>
+                        BACK
+                      </button>
+                      <button type="submit" className="figma-checkout-btn" style={{ flex: 1, height: '48px' }}>
+                        PROCEED TO PAY — {fmt(grandTotal)}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Right Column: Order Summary (White style) */}
+            <div className="figma-sidebar-cards">
+              
+              {/* Summary Card (White Background, gradient header) */}
+              <div className="order-summary-sidebar-card">
+                <div className="order-summary-sidebar-card__header">
+                  <h2 className="summary-card-title">Summary</h2>
+                </div>
+                <div className="order-summary-sidebar-card__content">
+                  <p className="summary-card-desc">
+                    The total cost consist of the tax, insurance and the delivery charge.
+                  </p>
+
+                  {/* Compact items preview inside summary card */}
+                  <div style={{ marginBottom: '20px' }}>
+                    {items.map(item => (
+                      <div key={item.id} style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
+                        <div style={{ width: '45px', height: '45px', background: '#eeeaf6', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
+                          <img src={item.image} alt={item.name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                        </div>
+                        <div style={{ flex: '1', minWidth: '0' }}>
+                          <h4 style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '10.5px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--navy)', margin: '0 0 2px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</h4>
+                          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '11px', color: 'var(--text-mid)', margin: '0' }}>Qty: {item.qty}</p>
+                        </div>
+                        <div style={{ textAlign: 'right', fontWeight: '600', fontSize: '13px', color: 'var(--navy)' }}>
+                          {fmt(item.price * item.qty)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="summary-info-divider" />
+                  
+                  <div className="summary-info-row">
+                    <span>Subtotal</span>
+                    <span>{fmt(total)}</span>
+                  </div>
+                  
+                  <div className="summary-info-row">
+                    <span>Delivery</span>
+                    <span>{shipping === 0 ? <span className="free-shipping-text">FREE</span> : fmt(shipping)}</span>
+                  </div>
+                  
+                  <div className="summary-info-row">
+                    <span>Tax (18% GST)</span>
+                    <span>{fmt(tax)}</span>
+                  </div>
+                  
+                  <div className="summary-info-row">
+                    <span>Insurance</span>
+                    <span>{fmt(insurance)}</span>
+                  </div>
+                  
+                  <div className="summary-info-divider" />
+                  
+                  <div className="summary-info-row grand-total-row">
+                    <span>TOTAL:</span>
+                    <span>{fmt(grandTotal)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Razorpay Integration Payment Trigger CTA */}
+              {activeStep === 3 && (
+                <button type="submit" className="figma-checkout-btn">
+                  PROCEED TO PAY — {fmt(grandTotal)}
+                </button>
+              )}
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
