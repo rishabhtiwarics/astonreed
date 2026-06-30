@@ -8,7 +8,7 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const data = await api.post('/v1/user/login', { email, password });
+      const data = await api.post('/user/login', { email, password });
       
       const token = data.token;
       const dbUser = data.data;
@@ -35,7 +35,7 @@ export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async ({ name, email, password, confirmPassword }, { dispatch, rejectWithValue }) => {
     try {
-      await api.post('/v1/user/register', { name, email, password, confirmPassword });
+      await api.post('/user/register', { name, email, password, confirmPassword });
       // Auto login after registration
       return dispatch(loginUser({ email, password })).unwrap();
     } catch (error) {

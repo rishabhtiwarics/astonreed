@@ -24,7 +24,7 @@ import {
 	faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { uploadToCloudinary } from "../../utils/uploadToCloudinary";
-import api from "../../utils/api";
+import api, { API_BASE_URL } from "../../utils/api";
 
 const imageFolder = "aston-reed/admin";
 
@@ -455,22 +455,23 @@ export default function AdminPanel() {
 	}, [categories.length, orders, products, resources]);
 
 	const fetchJson = useCallback(async (path, options = {}) => {
-		const method = options.method || 'GET';
+		const method = options.method || "GET";
 		const body = options.body ? JSON.parse(options.body) : undefined;
-		
-		try {
-			if (method === 'GET') {
-				return await api.get(`/v1${path}`);
-			} else if (method === 'POST') {
-				return await api.post(`/v1${path}`, body);
-			} else if (method === 'PUT') {
-				return await api.put(`/v1${path}`, body);
-			} else if (method === 'DELETE') {
-				return await api.delete(`/v1${path}`);
-			}
-		} catch (error) {
-			throw error;
+
+		if (method === "GET") {
+			return api.get(path);
 		}
+		if (method === "POST") {
+			return api.post(path, body);
+		}
+		if (method === "PUT") {
+			return api.put(path, body);
+		}
+		if (method === "DELETE") {
+			return api.delete(path);
+		}
+
+		return api.request(path, { ...options, body: options.body });
 	}, []);
 
 	const loadAdminData = useCallback(async () => {
@@ -2253,14 +2254,14 @@ function SeoPanel({ fetchJson, setError }) {
 					<span>Read-only endpoints</span>
 				</div>
 				<a
-					href={`${API_BASE}/seo/sitemap.xml`}
+					href={`${API_BASE_URL}/seo/sitemap.xml`}
 					target="_blank"
 					rel="noreferrer"
 				>
 					Open sitemap.xml
 				</a>
 				<a
-					href={`${API_BASE}/seo/robots.txt`}
+					href={`${API_BASE_URL}/seo/robots.txt`}
 					target="_blank"
 					rel="noreferrer"
 				>

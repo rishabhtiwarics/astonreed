@@ -20,7 +20,7 @@ const schema = Yup.object({
 export default function Checkout() {
   const dispatch = useDispatch();
   const { items, total } = useSelector(s => s.cart);
-  const { isAuthenticated, user, token } = useSelector(s => s.auth);
+  const { isAuthenticated, user } = useSelector(s => s.auth);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [paymentId, setPaymentId] = useState('');
   const [activeStep, setActiveStep] = useState(1);
@@ -85,7 +85,7 @@ export default function Checkout() {
 
       if (paymentMethod === 'cod') {
         try {
-          await api.post('/v1/order', orderPayload);
+          await api.post('/order', orderPayload);
           setPaymentId('Cash on Delivery');
           dispatch(clearCart());
           setOrderPlaced(true);
@@ -102,7 +102,7 @@ export default function Checkout() {
 
         try {
           // 1. Create order on backend to get Razorpay order_id
-          const rzOrder = await api.post('/v1/payment/create-order', { amount: grandTotal });
+          const rzOrder = await api.post('/payment/create-order', { amount: grandTotal });
           if (!rzOrder.id) {
             throw new Error('Failed to initiate Razorpay order');
           }
@@ -119,7 +119,7 @@ export default function Checkout() {
             handler: async function (response) {
               try {
                 // 3. Verify payment signature on backend
-                const verifyData = await api.post('/v1/payment/verify', {
+                const verifyData = await api.post('/payment/verify', {
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_signature: response.razorpay_signature
@@ -129,7 +129,7 @@ export default function Checkout() {
                 }
 
                 // 4. Save order to backend
-                await api.post('/v1/order', orderPayload);
+                await api.post('/order', orderPayload);
 
                 setPaymentId(response.razorpay_payment_id);
                 dispatch(clearCart());
