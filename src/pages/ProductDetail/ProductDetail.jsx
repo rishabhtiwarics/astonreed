@@ -50,7 +50,7 @@ export default function ProductDetail() {
 
   const products = useSelector(s => s.products.items);
   const wishlist = useSelector(s => s.wishlist.items);
-  const product  = products.find(p => p.id === Number(id));
+  const product  = products.find(p => String(p.id) === String(id));
 
   const [qty,        setQty]        = useState(1);
   const [activeSize, setActiveSize] = useState(0);
@@ -80,11 +80,11 @@ export default function ProductDetail() {
     );
   }
 
-  const isWishlisted  = wishlist.some(i => i.id === product.id);
-  const related       = products.filter(p => p.id !== product.id);
+  const isWishlisted  = wishlist.some(i => String(i.id) === String(product.id));
+  const related       = products.filter(p => String(p.id) !== String(product.id));
   const originalPrice = Math.round(product.price * 1.25);
   const fmt = n => '₹' + n.toLocaleString('en-IN');
-  const galleryImgs   = [product.image, ...products.filter(p => p.id !== product.id).map(p => p.image)].slice(0, 5);
+  const galleryImgs   = [product.image, ...products.filter(p => String(p.id) !== String(product.id)).map(p => p.image)].slice(0, 5);
 
   const handleAddToCart = () => {
     for (let i = 0; i < qty; i++) dispatch(addToCart(product));

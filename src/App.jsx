@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store';
 import './styles/globals.css';
+import { fetchProducts } from './store/slices/productsSlice';
 
 import MainLayout from './components/layout/MainLayout';
 import AuthLayout from './components/layout/AuthLayout';
@@ -14,12 +15,17 @@ import ProductDetail from './pages/ProductDetail/ProductDetail';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ForgotPassword from './pages/Auth/ForgotPassword';
+import AdminPanel from './pages/Admin/AdminPanel';
+
+// Load products from backend on app startup
+store.dispatch(fetchProducts());
 
 function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
         <Routes>
+          <Route path="/admin" element={<AdminPanel />} />
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

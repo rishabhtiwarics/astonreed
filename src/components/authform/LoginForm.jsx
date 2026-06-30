@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { loginStart, loginSuccess, loginFail } from '../../store/slices/authSlice';
+import { loginUser } from '../../store/slices/authSlice';
 
 const schema = Yup.object({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -18,14 +18,9 @@ export default function LoginForm() {
     initialValues: { email: '', password: '' },
     validationSchema: schema,
     onSubmit: async (values) => {
-      dispatch(loginStart());
-      // Simulate API call
-      await new Promise(r => setTimeout(r, 800));
-      if (values.email === 'test@astonreed.com' && values.password === 'password') {
-        dispatch(loginSuccess({ name: 'John Doe', email: values.email }));
+      const resultAction = await dispatch(loginUser({ email: values.email, password: values.password }));
+      if (loginUser.fulfilled.match(resultAction)) {
         navigate('/');
-      } else {
-        dispatch(loginFail('Invalid email or password'));
       }
     },
   });

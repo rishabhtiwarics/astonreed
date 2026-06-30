@@ -7,7 +7,7 @@ export default function AuthLayout() {
   // Determine dynamic quotes and icons based on route
   let quoteTitle = "Exploring new frontiers, one step at a time.";
   let quoteSub = "Beyond Earth's grasp";
-  let formIcon = null;
+  let formIcon;
 
   if (location.pathname === "/register") {
     quoteTitle = "Join us to discover curated luxury fragrances.";

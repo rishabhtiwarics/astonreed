@@ -1,4 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../utils/api';
 
 import product1 from '../../assets/img/reed/product_1.png';
 import product2 from '../../assets/img/reed/product_2.png';
@@ -16,6 +17,18 @@ const PRODUCTS = [
   { id: 8, name: 'Pearl Iris', type: 'Eau de Parfum', price: 15600, image: product4, category: 'limited', badge: 'Limited' },
 ];
 
+export const fetchProducts = createAsyncThunk(
+  'products/fetchProducts',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await api.get('/v1/product?limit=100');
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const productsSlice = createSlice({
   name: 'products',
   initialState: {
@@ -31,6 +44,30 @@ const productsSlice = createSlice({
         ? state.items
         : state.items.filter(p => p.category === action.payload);
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchProducts.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        const products = Array.isArray(action.payload) ? action.payload : PRODUCTS;
+        const mapped = products.map(p => ({
+          ...p,
+          id: p._id || p.id,
+          name: p.name || p.title,
+          image: p.image || p.images?.[0]?.url,
+          category: p.category && typeof p.category === 'object' ? p.category.slug : p.category
+        }));
+        state.items = mapped;
+        state.filtered = state.activeFilter === 'all'
+          ? mapped
+          : mapped.filter(p => p.category === state.activeFilter);
+      })
+      .addCase(fetchProducts.rejected, (state) => {
+        state.loading = false;
+      });
   },
 });
 

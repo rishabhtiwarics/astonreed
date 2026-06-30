@@ -46,6 +46,11 @@ export default function MobileMenu() {
           <NavLink to="/shop?filter=collections" onClick={close} className={({ isActive }) => isActive ? 'active' : ''}>Collections</NavLink>
           <NavLink to="/about" onClick={close} className={({ isActive }) => isActive ? 'active' : ''}>About</NavLink>
           <NavLink to="/contact" onClick={close} className={({ isActive }) => isActive ? 'active' : ''}>Contact</NavLink>
+          {isAuthenticated && user?.role === 'admin' && (
+            <NavLink to="/admin" onClick={close} className={({ isActive }) => isActive ? 'active' : ''} style={{ color: 'var(--gold-light)' }}>
+              Admin Panel
+            </NavLink>
+          )}
         </nav>
 
         {/* Footer — logo + auth links */}

@@ -23,9 +23,9 @@ export default function Header() {
   const filteredProducts = searchQuery.trim() === ""
     ? products
     : products.filter(p => 
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        p.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.category.toLowerCase().includes(searchQuery.toLowerCase())
+        (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+        (p.type || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (typeof p.category === 'string' ? p.category : '').toLowerCase().includes(searchQuery.toLowerCase())
       );
 
   return (
@@ -113,6 +113,11 @@ export default function Header() {
                       <li>
                         <Link to="/cart" className="user-dropdown-link">Shopping Bag</Link>
                       </li>
+                      {user?.role === 'admin' && (
+                        <li>
+                          <Link to="/admin" className="user-dropdown-link" style={{ color: 'var(--gold)', fontWeight: 600 }}>Admin Panel</Link>
+                        </li>
+                      )}
                     </ul>
                     <div className="user-dropdown-divider"></div>
                     <button onClick={() => dispatch(logout())} className="btn-logout">

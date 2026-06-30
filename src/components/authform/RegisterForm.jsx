@@ -1,8 +1,8 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { registerSuccess } from '../../store/slices/authSlice';
+import { registerUser } from '../../store/slices/authSlice';
 
 const schema = Yup.object({
   name: Yup.string().min(2, 'Minimum 2 characters').required('Name is required'),
@@ -16,14 +16,21 @@ const schema = Yup.object({
 export default function RegisterForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { error } = useSelector(s => s.auth);
 
   const formik = useFormik({
     initialValues: { name: '', email: '', password: '', confirmPassword: '' },
     validationSchema: schema,
     onSubmit: async (values) => {
-      await new Promise(r => setTimeout(r, 600));
-      dispatch(registerSuccess({ name: values.name, email: values.email }));
-      navigate('/');
+      const resultAction = await dispatch(registerUser({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        confirmPassword: values.confirmPassword
+      }));
+      if (registerUser.fulfilled.match(resultAction)) {
+        navigate('/');
+      }
     },
   });
 
@@ -31,6 +38,12 @@ export default function RegisterForm() {
     <div>
       <h1 className="auth-title">Create Account</h1>
       <p className="auth-sub">Join the Aston Reed family today</p>
+
+      {error && (
+        <div style={{ background: '#fff5f5', border: '1px solid #fed7d7', color: '#c53030', padding: '12px 16px', borderRadius: '4px', fontSize: '12px', marginBottom: '20px' }}>
+          {error}
+        </div>
+      )}
 
       <form onSubmit={formik.handleSubmit}>
         <div className="form-group">

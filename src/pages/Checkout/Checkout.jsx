@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { clearCart } from '../../store/slices/cartSlice';
 import innrbnner from '../../assets/img/reed/innrbnner.png';
+import api from '../../utils/api';
 
 const schema = Yup.object({
   fullName: Yup.string().min(2, 'Name must be at least 2 characters').required('Full name is required'),
@@ -18,11 +19,12 @@ const schema = Yup.object({
 
 export default function Checkout() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { items, total } = useSelector(s => s.cart);
+  const { isAuthenticated, user, token } = useSelector(s => s.auth);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [paymentId, setPaymentId] = useState('');
   const [activeStep, setActiveStep] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState('cod');
 
   const fmt = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
   const shipping = total > 9900 ? 0 : 299;
@@ -47,49 +49,114 @@ export default function Checkout() {
 
   const formik = useFormik({
     initialValues: {
-      fullName: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: '',
-      state: '',
-      pincode: '',
+      fullName: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      address: user?.shippingAddress?.addressLine1 || '',
+      city: user?.shippingAddress?.city || '',
+      state: user?.shippingAddress?.state || '',
+      pincode: user?.shippingAddress?.pinCode || '',
     },
+    enableReinitialize: true,
     validationSchema: schema,
     onSubmit: async (values) => {
-      const sdkLoaded = await loadRazorpay();
-      if (!sdkLoaded) {
-        alert('Razorpay Payment Gateway failed to load. Please check your internet connection.');
+      if (!isAuthenticated) {
+        alert('Please sign in to place an order.');
         return;
       }
 
-      const options = {
-        key: 'rzp_test_placeholderKey', // Testing client-side key
-        amount: grandTotal * 100, // Amount in paisa
-        currency: 'INR',
-        name: 'Aston Reed',
-        description: 'Luxury Fragrance Order Checkout',
-        image: 'https://placehold.co/150x150/1a1a3e/c9a84c?text=AR',
-        handler: function (response) {
-          setPaymentId(response.razorpay_payment_id || 'pay_simulated_id_1001');
-          dispatch(clearCart());
-          setOrderPlaced(true);
+      const orderItems = items.map(item => ({
+        product: item._id || item.id,
+        quantity: item.qty
+      }));
+
+      const orderPayload = {
+        items: orderItems,
+        shippingAddress: {
+          addressLine1: values.address,
+          addressLine2: '',
+          city: values.city,
+          state: values.state,
+          pinCode: values.pincode,
+          country: 'India'
         },
-        prefill: {
-          name: values.fullName,
-          email: values.email,
-          contact: values.phone,
-        },
-        notes: {
-          address: `${values.address}, ${values.city}, ${values.state} - ${values.pincode}`,
-        },
-        theme: {
-          color: '#5b3d8f', // Brand purple
-        },
+        paymentMethod: paymentMethod
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      if (paymentMethod === 'cod') {
+        try {
+          await api.post('/v1/order', orderPayload);
+          setPaymentId('Cash on Delivery');
+          dispatch(clearCart());
+          setOrderPlaced(true);
+        } catch (error) {
+          alert(error.message);
+        }
+      } else {
+        // Razorpay Checkout flow
+        const sdkLoaded = await loadRazorpay();
+        if (!sdkLoaded) {
+          alert('Razorpay Payment Gateway failed to load. Please check your internet connection.');
+          return;
+        }
+
+        try {
+          // 1. Create order on backend to get Razorpay order_id
+          const rzOrder = await api.post('/v1/payment/create-order', { amount: grandTotal });
+          if (!rzOrder.id) {
+            throw new Error('Failed to initiate Razorpay order');
+          }
+
+          // 2. Open Razorpay checkout modal
+          const options = {
+            key: 'rzp_test_Sk1dkDx87k6FxW',
+            amount: grandTotal * 100,
+            currency: 'INR',
+            name: 'Aston Reed',
+            description: 'Luxury Fragrance Order Checkout',
+            image: 'https://placehold.co/150x150/1a1a3e/c9a84c?text=AR',
+            order_id: rzOrder.id,
+            handler: async function (response) {
+              try {
+                // 3. Verify payment signature on backend
+                const verifyData = await api.post('/v1/payment/verify', {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature
+                });
+                if (!verifyData.success) {
+                  throw new Error('Payment verification failed');
+                }
+
+                // 4. Save order to backend
+                await api.post('/v1/order', orderPayload);
+
+                setPaymentId(response.razorpay_payment_id);
+                dispatch(clearCart());
+                setOrderPlaced(true);
+              } catch (err) {
+                alert(err.message);
+              }
+            },
+            prefill: {
+              name: values.fullName,
+              email: values.email,
+              contact: values.phone,
+            },
+            notes: {
+              address: `${values.address}, ${values.city}, ${values.state} - ${values.pincode}`,
+            },
+            theme: {
+              color: '#5b3d8f',
+            },
+          };
+
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+        } catch (error) {
+          alert(error.message);
+        }
+      }
     },
   });
 
@@ -326,13 +393,16 @@ export default function Checkout() {
           <div className="cart-figma-layout">
             
             {/* Left Column: Form Card */}
-            <div className="order-items-card checkout-form-card">
-              
-              {activeStep === 1 && (
+            <div className="order-items-card checkout-form-card">              {activeStep === 1 && (
                 <>
                   <div className="order-items-header">
                     <h2 className="order-items-title">1. Identify</h2>
                   </div>
+                  {!isAuthenticated && (
+                    <div style={{ background: '#fff5f5', border: '1px solid #fed7d7', color: '#c53030', padding: '12px 16px', borderRadius: '4px', fontSize: '13px', marginBottom: '20px', fontFamily: 'Montserrat, sans-serif' }}>
+                      You must be signed in to check out. <Link to="/login" style={{ color: 'var(--purple)', fontWeight: 700, textDecoration: 'underline' }}>Sign In Here</Link>
+                    </div>
+                  )}
                   <div className="checkout-form-grid-2">
                     <div className="form-group" style={{ gridColumn: 'span 2' }}>
                       <label className="form-label">Full Name</label>
@@ -340,32 +410,35 @@ export default function Checkout() {
                         className="form-input"
                         type="text"
                         placeholder="Enter your full name"
+                        disabled={!isAuthenticated}
                         {...formik.getFieldProps('fullName')}
                       />
                       {formik.touched.fullName && formik.errors.fullName && (
                         <p className="form-error">{formik.errors.fullName}</p>
                       )}
                     </div>
-
+ 
                     <div className="form-group">
                       <label className="form-label">Email Address</label>
                       <input
                         className="form-input"
                         type="email"
                         placeholder="Enter your email"
+                        disabled={!isAuthenticated}
                         {...formik.getFieldProps('email')}
                       />
                       {formik.touched.email && formik.errors.email && (
                         <p className="form-error">{formik.errors.email}</p>
                       )}
                     </div>
-
+ 
                     <div className="form-group">
                       <label className="form-label">Phone Number</label>
                       <input
                         className="form-input"
                         type="tel"
                         placeholder="10-digit mobile number"
+                        disabled={!isAuthenticated}
                         {...formik.getFieldProps('phone')}
                       />
                       {formik.touched.phone && formik.errors.phone && (
@@ -374,7 +447,7 @@ export default function Checkout() {
                     </div>
                   </div>
                   <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'flex-end' }}>
-                    <button type="button" onClick={handleNextStep1} className="figma-checkout-btn" style={{ minWidth: '240px', width: 'auto', maxWidth: '100%' }}>
+                    <button type="button" onClick={handleNextStep1} disabled={!isAuthenticated} className="figma-checkout-btn" style={{ minWidth: '240px', width: 'auto', maxWidth: '100%', opacity: isAuthenticated ? 1 : 0.5 }}>
                       CONTINUE TO SHIPPING
                     </button>
                   </div>
@@ -483,24 +556,47 @@ export default function Checkout() {
 
                     <div style={{ background: '#f6f4f9', padding: '20px', border: '1px solid #e5e2ef', marginBottom: '24px' }}>
                       <h4 style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '11px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--navy)', margin: '0 0 10px 0' }}>Payment Method</h4>
-                      <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '13px', color: 'var(--navy)', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--gold)' }}>
-                          <rect x="2" y="5" width="20" height="14" rx="2" />
-                          <line x1="2" y1="10" x2="22" y2="10" />
-                        </svg>
-                        Razorpay Secure Checkout
-                      </p>
-                      <p style={{ fontSize: '11px', color: 'var(--text-mid)', margin: '0', lineHeight: '1.5', fontFamily: 'Montserrat, sans-serif' }}>
-                        Please review your details. Click "Proceed to Pay" to launch the secure payment portal.
-                      </p>
-                    </div>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', color: 'var(--navy)', fontWeight: '600' }}>
+                          <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="cod" 
+                            checked={paymentMethod === 'cod'} 
+                            onChange={() => setPaymentMethod('cod')} 
+                          />
+                          Cash on Delivery (COD)
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', color: 'var(--navy)', fontWeight: '600' }}>
+                          <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="razorpay" 
+                            checked={paymentMethod === 'razorpay'} 
+                            onChange={() => setPaymentMethod('razorpay')} 
+                          />
+                          Razorpay Secure Payment
+                        </label>
+                      </div>
 
+                      {paymentMethod === 'cod' ? (
+                        <p style={{ fontSize: '11px', color: 'var(--text-mid)', margin: '0', lineHeight: '1.5', fontFamily: 'Montserrat, sans-serif' }}>
+                          Pay with cash upon delivery. Click "Place Order" to finalize your purchase.
+                        </p>
+                      ) : (
+                        <p style={{ fontSize: '11px', color: 'var(--text-mid)', margin: '0', lineHeight: '1.5', fontFamily: 'Montserrat, sans-serif' }}>
+                          Please review your details. Click "Proceed to Pay" to launch the secure payment portal.
+                        </p>
+                      )}
+                    </div>
+ 
                     <div className="checkout-actions-row" style={{ marginTop: 0 }}>
                       <button type="button" onClick={() => setActiveStep(2)} className="figma-qty-btn" style={{ height: '48px', width: '120px', border: '1px solid #e5e2ef', background: '#fff', letterSpacing: '1.5px', fontWeight: '700' }}>
                         BACK
                       </button>
                       <button type="submit" className="figma-checkout-btn" style={{ flex: 1, height: '48px' }}>
-                        PROCEED TO PAY — {fmt(grandTotal)}
+                        {paymentMethod === 'cod' ? 'PLACE ORDER — ' + fmt(grandTotal) : 'PROCEED TO PAY — ' + fmt(grandTotal)}
                       </button>
                     </div>
                   </div>
@@ -573,7 +669,7 @@ export default function Checkout() {
               {/* Razorpay Integration Payment Trigger CTA */}
               {activeStep === 3 && (
                 <button type="submit" className="figma-checkout-btn">
-                  PROCEED TO PAY — {fmt(grandTotal)}
+                  {paymentMethod === 'cod' ? 'PLACE ORDER — ' + fmt(grandTotal) : 'PROCEED TO PAY — ' + fmt(grandTotal)}
                 </button>
               )}
             </div>
